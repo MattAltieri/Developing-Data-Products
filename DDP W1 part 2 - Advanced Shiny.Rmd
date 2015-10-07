@@ -247,4 +247,4 @@ output$text3 <- renderText({
 - Debugging `shiny` apps can be tricky
 - We saw that `runApp(displayMode='showcase')` highlights execution while a `shiny` app runs
 - Using `cat` in your code displays output to `stdout` (so R console)
-- The `browser()` function can interupt execution and can be called conditionally ([http://shiny.rstudio.com/articles/debugging.html](http://shiny.rstudio.com/articles/debugging.html))
+- The `browser()` function can interupt execution and can be called conditionally ([http://shiny.rstudio.com/articles/debugging.html](http://shiny.rstudio.com/articles/debugging.html)) 
