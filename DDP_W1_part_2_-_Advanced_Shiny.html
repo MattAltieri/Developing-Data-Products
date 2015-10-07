@@ -70,7 +70,231 @@ img {
 </div>
 
 
+<div id="shiny-revisited" class="section level2">
+<h2><code>shiny</code> Revisited</h2>
+<ul>
+<li>In the last lecture, we covered basic creation of <code>shiny</code> applications</li>
+<li>If you tried it and are like most, you had an easy time with <code>ui.R</code> but a harder time with <code>server.R</code></li>
+<li>In this lecture, we cover some more of the details of shiny</li>
+<li>Since writing the last lecture, a more detailed tutorial has been created that is worth checking out (<a href="http://shiny.rstudio.com/tutorial/" class="uri">http://shiny.rstudio.com/tutorial/</a>)</li>
+</ul>
+<hr />
+</div>
+<div id="details" class="section level2">
+<h2>Details</h2>
+<ul>
+<li>Code that you put before <code>shinyServer</code> in the <code>server.R</code> function gets called once when you do <code>runApp()</code></li>
+<li>Code inside the unnamed function of <code>shinyServer(function(input, output){})</code> – but not in a reactive statement – will run once for every new user (or page refresh)</li>
+<li>Code in reactive functions of <code>shinyServer</code> get run repeatedly as needed when new values are entered
+<ul>
+<li>Reactive functions are those like <code>render*</code></li>
+</ul></li>
+</ul>
+<hr />
+</div>
+<div id="experiment" class="section level2">
+<h2>Experiment</h2>
+<div id="ui.r" class="section level3">
+<h3><code>ui.R</code></h3>
+<pre class="r"><code>library(shiny)
+shinyUI(pageWithSidebar(
+    headerPanel(&quot;Hello Shiny!&quot;),
+    sidebarPanel(
+        textInput(inputId=&quot;text1&quot;, label=&quot;Input Text1&quot;),
+        textInput(inputId=&quot;text2&quot;, label=&quot;Input Text2&quot;)
+    ),
+    mainPanel(
+        p('Output text1'),
+        textOutput('text1'),
+        p('Output text2'),
+        textOutput('text2'),
+        p('Output text3'),
+        textOutput('text3'),
+        p('Output text4'),
+        textOutput('text4'),
+        p('Inside text, but non-reactive'),
+        textOutput('text5')
+    )
+))</code></pre>
+</div>
+<div id="server.r-set-x---0-before-running" class="section level3">
+<h3>‘server.R’ – Set <code>x &lt;- 0</code> before running</h3>
+<pre class="r"><code>library(shiny)
+x &lt;&lt;- x + 1
+y &lt;&lt;- 0
 
+shinyServer(
+    function(input, output) {
+        y &lt;&lt;- y + 1
+        output$text1 &lt;- renderText({input$text1})
+        output$text2 &lt;- renderText({input$text2})
+        output$text3 &lt;- renderText({as.numeric(input$text1) + 1})
+        output$text4 &lt;- renderText(y)
+        output$text5 &lt;- renderText(x)
+    }
+)</code></pre>
+<hr />
+</div>
+</div>
+<div id="try-it" class="section level2">
+<h2>Try It</h2>
+<ul>
+<li>Type <code>runApp()</code></li>
+<li>Notice hitting refresh increments <code>y</code> but entering values in the textbox does not</li>
+<li>Notice <code>x</code> is always 1</li>
+<li>Watch how it updated <code>text1</code> and <code>text2</code> as needed</li>
+<li>Doesn’t add 1 to <code>text1</code> every time a new <code>text2</code> is input</li>
+<li><em>Important</em> Try <code>runApp(display.mode='showcase')</code></li>
+</ul>
+<hr />
+</div>
+<div id="reactive-expressions" class="section level2">
+<h2>Reactive Expressions</h2>
+<ul>
+<li>Sometimes to speed up your app, you want reactive operations (those operations that depend on widget input values) to be performed outside of a <code>render*</code> statement</li>
+<li>For example, you want to do some code that gets reused in several <code>render*</code> statements and don’t want to recalculate it for each</li>
+<li>The <code>reactive</code> function is made for this purpose</li>
+</ul>
+<hr />
+</div>
+<div id="example" class="section level2">
+<h2>Example</h2>
+<div id="server.r" class="section level3">
+<h3><code>server.R</code></h3>
+<pre class="r"><code>library(shiny)
+shinyServer(
+    function(input, output) {
+        x &lt;- reactive({as.numeric(input$text1) + 100})
+        output$text1 &lt;- renderText({x()                          })
+        output$text2 &lt;- renderText({x() + as.numeric(input$text2)})
+    }
+)</code></pre>
+<hr />
+</div>
+</div>
+<div id="as-opposed-to" class="section level2">
+<h2>As opposed to</h2>
+<pre class="r"><code>library(shiny)
+shinyServer(
+    function(input, output) {
+        output$text1 &lt;- renderText({as.numeric(input$text1) + 100  })
+        output$text2 &lt;- renderText({as.numeric(input$text1) + 100 +
+            as.numeric(input$text2)})
+    }
+)</code></pre>
+<hr />
+</div>
+<div id="discussion" class="section level2">
+<h2>Discussion</h2>
+<ul>
+<li>Do <code>runApp(display.mode='showcase')</code></li>
+<li>While inconsequential, the second example has to add 100 twice every time text1 is updated for the second set of code</li>
+<li>Also note the somewhat odd syntax for reactive variables</li>
+</ul>
+<hr />
+</div>
+<div id="non-reactive-reactivity-what" class="section level2">
+<h2>Non-reactive Reactivity (What?)</h2>
+<ul>
+<li>Sometimes you don’t want <code>shiny</code> to immediately perform reactive calculations from widget inputs</li>
+<li>In other words, you want something like a submit button</li>
+</ul>
+<hr />
+</div>
+<div id="ui.r-1" class="section level2">
+<h2><code>ui.R</code></h2>
+<pre class="r"><code>library(shiny)
+shinyUI(pageWithSidebar(
+    headerPanel(&quot;Hello Shiny1&quot;),
+    sidebarPanel(
+        textInput(inputId=&quot;text1&quot;, label=&quot;Input Text1&quot;),
+        textInput(inputId=&quot;text2&quot;, label=&quot;Input Text2&quot;),
+        actionButton(&quot;goButton&quot;, &quot;Go!&quot;)
+    ),
+    mainPanel(
+        p('Output text1'),
+        textOutput('text1'),
+        p('Output text2'),
+        textOutput('text2'),
+        p('Output text3'),
+        textOutput('text3')
+    )
+))</code></pre>
+<hr />
+</div>
+<div id="server.r-1" class="section level2">
+<h2><code>server.R</code></h2>
+<pre class="r"><code>library(shiny)
+shinyServer(
+    function(input, output) {
+        output$text1 &lt;- renderText({input$text1})
+        output$text2 &lt;- renderText({input$text2})
+        output$text3 &lt;- renderText({
+            input$goButton
+            isolate(paste(input$text1, input$text2))
+        })
+    }
+)</code></pre>
+<hr />
+</div>
+<div id="try-it-out" class="section level2">
+<h2>Try It Out</h2>
+<ul>
+<li>Notice it doesn’t display output <code>text3</code> until the <code>go</code> button is pressed</li>
+<li><code>input$goButton</code> (or whatever you named it) gets increased by one for every time pushed</li>
+<li>So, when in reactive code such as <code>render*</code> or <code>reactive</code>, you can use conditional statements like below to only execute code on the first button press or to not execute until the first or subsequent button press</li>
+</ul>
+<p><code>if(input$goButton == 1) { Conditional Statements }</code></p>
+<hr />
+</div>
+<div id="example-1" class="section level2">
+<h2>Example</h2>
+<p>Here’s some replaced code from our previous <code>server.R</code></p>
+<pre class="r"><code>output$text3 &lt;- renderText({
+    if(input$goButton == 0) &quot;You have not pressed the button&quot;
+    else if(input$goButton == 1) &quot;You pressed it once&quot;
+    else &quot;Okay quit pressing it&quot;
+})</code></pre>
+<hr />
+</div>
+<div id="more-on-layouts" class="section level2">
+<h2>More On Layouts</h2>
+<ul>
+<li>The sidebar layout with a main panel is the easiest</li>
+<li>Using <code>shinyUI(fluidpage(</code> is much more flexible and allows tighter access to the bootstrap styles</li>
+<li>Examples here (<a href="http://shiny.rstudio.com/articles/layout-guide.html" class="uri">http://shiny.rstudio.com/articles/layout-guide.html</a>)</li>
+<li><code>fluidRow</code> statements create rows and then the <code>column</code> function from within it can create columns</li>
+<li>Tabsets, navlists, and navbars can be created for more complex apps</li>
+</ul>
+<hr />
+</div>
+<div id="directly-using-html" class="section level2">
+<h2>Directly Using html</h2>
+<ul>
+<li>Fore more complex layouts, direct use of html is preferred (<a href="http://shiny.rstudio.com/articles/html-ui.html" class="uri">http://shiny.rstudio.com/articles/html-ui.html</a>)</li>
+<li>Also, if you know web development well, you might find using R to create web layouts kind of annoying</li>
+<li>Create a directory called <em>www</em> in the same directory with <code>server.R</code></li>
+<li>Have an <code>index.html</code> page in that directory</li>
+<li>Your named input variables will be passed to <code>server.R</code>
+<ul>
+<li><code>&lt;input type=&quot;number&quot; name=&quot;n&quot; value=&quot;500&quot; min=&quot;1&quot; max=&quot;1000&quot; /&gt;</code></li>
+</ul></li>
+<li>Your <code>server.R</code> output will have class definitions of the form <code>shiny-*</code>
+<ul>
+<li><code>&lt;pre id=&quot;summary&quot; class=&quot;shiny-text-output&quot;&gt;&lt;/pre&gt;</code></li>
+</ul></li>
+</ul>
+<hr />
+</div>
+<div id="debugging-techniques-for-shiny" class="section level2">
+<h2>Debugging Techniques for <code>shiny</code></h2>
+<ul>
+<li>Debugging <code>shiny</code> apps can be tricky</li>
+<li>We saw that <code>runApp(displayMode='showcase')</code> highlights execution while a <code>shiny</code> app runs</li>
+<li>Using <code>cat</code> in your code displays output to <code>stdout</code> (so R console)</li>
+<li>The <code>browser()</code> function can interupt execution and can be called conditionally (<a href="http://shiny.rstudio.com/articles/debugging.html" class="uri">http://shiny.rstudio.com/articles/debugging.html</a>)</li>
+</ul>
+</div>
 
 
 </div>
