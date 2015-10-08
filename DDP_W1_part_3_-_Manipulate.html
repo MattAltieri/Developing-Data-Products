@@ -70,7 +70,45 @@ img {
 </div>
 
 
-
+<div id="manipulate" class="section level2">
+<h2><code>manipulate</code></h2>
+<ul>
+<li>Suppose that you want to create a quick interactive graphic
+<ul>
+<li>You have to do it <em>now</em></li>
+<li>The intended users also use RStudio</li>
+</ul></li>
+<li><code>manipulate</code> is a really cool solution that is often all you need to quickly make interactive graphics</li>
+</ul>
+<hr />
+</div>
+<div id="documentation" class="section level2">
+<h2>Documentation</h2>
+<ul>
+<li><code>manipulate</code> is well-documented at the RStudio website here
+<ul>
+<li><a href="https://support.rstudio.com/hc/en-us/articles/200551906-Interactive-Plotting-with-Manipulate" class="uri">https://support.rstudio.com/hc/en-us/articles/200551906-Interactive-Plotting-with-Manipulate</a></li>
+</ul></li>
+<li>From there, try this <code>library(manipulate); manipulate(plot(1:x), Xx = slider(1,100))</code></li>
+<li>You can create a slider, checkbox, or picker (dropdown) and have more than one</li>
+</ul>
+<hr />
+</div>
+<div id="example-from-the-regression-class" class="section level2">
+<h2>Example from the Regression Class</h2>
+<pre class="r"><code>library(manipulate)
+library(UsingR)
+data(galton)
+myHist &lt;- function(mu) {
+    hist(galton$child, col=&quot;blue&quot;, breaks=100)
+    lines(c(mu,mu), c(0,150), col=&quot;red&quot;, lwd=5)
+    mse &lt;- mean((galton$child - mu)^2)
+    text(63, 150, paste(&quot;mu = &quot;, mu))
+    text(63, 140, paste(&quot;MSE = &quot;, round(mse, 2)))
+}
+manipulate(myHist(mu), mu=slider(62, 74, step=0.5))</code></pre>
+<hr />
+</div>
 
 
 </div>
