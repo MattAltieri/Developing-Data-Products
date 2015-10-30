@@ -70,7 +70,414 @@ img {
 </div>
 
 
+<div id="classes-and-methods" class="section level2">
+<h2>Classes and Methods</h2>
+<ul>
+<li>A system for doing object oriented programming</li>
+<li><code>R</code> was originally quite interesting because it is both interactive <em>and</em> has a system for object orientation
+<ul>
+<li>Other languages which support OOP (C++, Java, Lisp, Python, Perl) generally speaking are not interactive languages</li>
+</ul></li>
+<li>In <code>R</code> much of the code for supporting classes/methods is written by John Chambers himself (the creator of the original <code>S</code> language) and documented in the book <em>Programming with Data: A Guide to the S Language</em></li>
+<li>A natural extension of Chambers’ idea of allowing to cross the user/programmer spectrum</li>
+<li>Object oriented programming is a bit different in <code>R</code> than it is in most languages – even if you are familiar with the idea, you may want to pay attention to the details</li>
+</ul>
+<hr />
+</div>
+<div id="two-styles-of-classes-and-methods" class="section level2">
+<h2>Two Styles of Classes and Methods</h2>
+<p><code>S3</code> classes/methods</p>
+<ul>
+<li>Included with verison 3 of the <code>S</code> language</li>
+<li>Informal, a little kludgey</li>
+<li>Sometimes called <em>old-style</em> classes/methods</li>
+</ul>
+<p><code>S4</code> classes/methods</p>
+<ul>
+<li>More formal and rigorous</li>
+<li>Included with S-PLUS 6 and R 1.4.0 (December 2001)</li>
+<li>Also called <em>new-style</em> classes/methods</li>
+</ul>
+<hr />
+</div>
+<div id="two-worlds-living-side-by-side" class="section level2">
+<h2>Two worlds living side-by-side</h2>
+<ul>
+<li>For now (and the foreseeable future), <code>S3</code> classes/methods and <code>S4</code> classes/methods are separate systems (but they can be mixed to some degree)</li>
+<li>Each system can be used fairly independently of the other</li>
+<li>Developers of new projects (you!) are encouraged to use the <code>S4</code> style classes/methods
+<ul>
+<li>Used extensively in the Bioconductor project</li>
+</ul></li>
+<li>But many developers still use <code>S3</code> classes/methods ebcause they are “quick and dirty” (and easier)</li>
+<li>In this lecture we will focus primarily on <code>S4</code> classes/methods</li>
+<li>The code for implementing S4 classes/methods in <code>R</code> is in the <code>methods</code> package, which is usually loaded by default (but you can load it with <code>library(methods)</code> if for some reason it is not loaded)</li>
+</ul>
+<hr />
+</div>
+<div id="object-oriented-programming-in-r" class="section level2">
+<h2>Object Oriented Programming in <code>R</code></h2>
+<ul>
+<li>A <em>class</em> is a description of a thing. A class can be defined using <code>setClass()</code> in the <code>methods</code> package</li>
+<li>An <em>object</em> is an instance of a <em>class</em>. Objects can be created using <code>new()</code></li>
+<li>A <em>method</em> is a function that only operates on a certain <em>class</em> of <em>objects</em></li>
+<li>A <em>generic function</em> is an <code>R</code> function which dispatches <em>methods</em>. A <em>generic function</em> typically encapsulates a “generic” concept (e.g. <code>plot</code>, <code>mean</code>, <code>predict</code>, …)
+<ul>
+<li>The <em>generic function</em> does not actually do any computation</li>
+</ul></li>
+<li>A <em>method</em> is the implementation of a <em>generic function</em> for an <em>object</em> of a particular <em>class</em></li>
+</ul>
+<hr />
+</div>
+<div id="things-to-look-up" class="section level2">
+<h2>Things to Look Up</h2>
+<ul>
+<li>The help files for the <code>methods</code> package are extensive – do read them as they are the primary documentation</li>
+<li>You may want to start with <code>?Classes</code> and <code>?Methods</code></li>
+<li>Check out <code>?setClass</code>, <code>?setMethod</code>, and <code>?setGeneric</code></li>
+<li>Some of it gets technical, but try your best for now – it will make sense in the future as you keep using it</li>
+<li>Most of the documentation in the <code>methods</code> package is oriented towards developers/programmers as these are the primary people using classes/methods</li>
+</ul>
+<hr />
+</div>
+<div id="classes" class="section level2">
+<h2>Classes</h2>
+<p>All <em>objects</em> in <code>R</code> have a <em>class</em> which can be determined by the <code>class()</code> function</p>
+<pre class="r"><code>class(1)</code></pre>
+<pre><code>[1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>class(TRUE)</code></pre>
+<pre><code>[1] &quot;logical&quot;</code></pre>
+<pre class="r"><code>class(rnorm(100))</code></pre>
+<pre><code>[1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>class(NA)</code></pre>
+<pre><code>[1] &quot;logical&quot;</code></pre>
+<pre class="r"><code>class(&quot;foo&quot;)</code></pre>
+<pre><code>[1] &quot;character&quot;</code></pre>
+<hr />
+</div>
+<div id="classes-contd" class="section level2">
+<h2>Classes (cont’d)</h2>
+<p>Data <em>classes</em> go beyond the atomic <em>classes</em></p>
+<pre class="r"><code>x &lt;- rnorm(100)
+y &lt;- x + rnorm(100)
+fit &lt;- lm(y ~ x)
+class(fit)</code></pre>
+<pre><code>[1] &quot;lm&quot;</code></pre>
+<hr />
+</div>
+<div id="genericsmethods-in-r" class="section level2">
+<h2>Generics/Methods in <code>R</code></h2>
+<ul>
+<li><code>S4</code> and <code>S3</code> style generic functions look different but conceptually, they are the same (they play the same role)</li>
+<li>When you program you can write new <em>methods</em> for an existing <em>generic</em> OR create your own <em>generics</em> and associated <em>methods</em></li>
+<li>Of course, if a data type does not exist in <code>R</code> that matches your needs, you can always define a new <em>class</em> along with <em>generics</em>/<em>methods</em> that go with it</li>
+</ul>
+<hr />
+</div>
+<div id="an-s3-generic-function-in-the-base-package" class="section level2">
+<h2>An <code>S3</code> Generic Function (in the <code>base</code> package)</h2>
+<p>The <code>mean</code> and <code>print</code> functions are generic</p>
+<pre class="r"><code>mean</code></pre>
+<pre><code>function (x, ...) 
+UseMethod(&quot;mean&quot;)
+&lt;bytecode: 0x00000000086c0b70&gt;
+&lt;environment: namespace:base&gt;</code></pre>
+<pre class="r"><code>print</code></pre>
+<pre><code>function (x, ...) 
+UseMethod(&quot;print&quot;)
+&lt;bytecode: 0x00000000081612d8&gt;
+&lt;environment: namespace:base&gt;</code></pre>
+<hr />
+</div>
+<div id="s3-methods" class="section level2">
+<h2><code>S3</code> Methods</h2>
+<p>The <code>mean</code> <em>generic</em> function has a number of <em>methods</em> associated with it</p>
+<pre class="r"><code>methods(&quot;mean&quot;)</code></pre>
+<pre><code>[1] mean.Date     mean.default  mean.difftime mean.POSIXct  mean.POSIXlt </code></pre>
+<hr />
+</div>
+<div id="an-s4-generic-function" class="section level2">
+<h2>An <code>S4</code> Generic Function</h2>
+<p>The <code>show</code> <em>function</em> is from the <code>methods</code>package and is the <code>S4</code> equivalent of <code>print</code></p>
+<pre class="r"><code>show</code></pre>
+<pre><code>standardGeneric for &quot;show&quot; defined from package &quot;methods&quot;
 
+function (object) 
+standardGeneric(&quot;show&quot;)
+&lt;bytecode: 0x0000000008809bc0&gt;
+&lt;environment: 0x000000000823eee0&gt;
+Methods may be defined for arguments: object
+Use  showMethods(&quot;show&quot;)  for currently available ones.
+(This generic function excludes non-simple inheritance; see ?setIs)</code></pre>
+<p>The <code>show</code> <em>function</em> is usually not called directly (much like <code>print</code>) because <em>objects</em> are auto-printed</p>
+<hr />
+</div>
+<div id="s4-methods" class="section level2">
+<h2><code>S4</code> Methods</h2>
+<pre class="r"><code>showMethods(&quot;show&quot;)</code></pre>
+<pre><code>Function: show (package methods)
+object=&quot;ANY&quot;
+object=&quot;classGeneratorFunction&quot;
+object=&quot;classRepresentation&quot;
+object=&quot;envRefClass&quot;
+object=&quot;function&quot;
+    (inherited from: object=&quot;ANY&quot;)
+object=&quot;genericFunction&quot;
+object=&quot;genericFunctionWithTrace&quot;
+object=&quot;MethodDefinition&quot;
+object=&quot;MethodDefinitionWithTrace&quot;
+object=&quot;MethodSelectionReport&quot;
+object=&quot;MethodWithNext&quot;
+object=&quot;MethodWithNextWithTrace&quot;
+object=&quot;namedList&quot;
+object=&quot;ObjectsWithPackage&quot;
+object=&quot;oldClass&quot;
+object=&quot;refClassRepresentation&quot;
+object=&quot;refMethodDef&quot;
+object=&quot;refObjectGenerator&quot;
+object=&quot;signature&quot;
+object=&quot;sourceEnvironment&quot;
+object=&quot;standardGeneric&quot;
+    (inherited from: object=&quot;genericFunction&quot;)
+object=&quot;traceable&quot;</code></pre>
+<hr />
+</div>
+<div id="genericmethod-mechanism" class="section level2">
+<h2>Generic/Method Mechanism</h2>
+<p>The first argument of a <em>generic function</em> is an <em>object</em> of a particular <em>class</em> (there may be other arguments)</p>
+<ol style="list-style-type: decimal">
+<li>The <em>generic function</em> checks the <em>class</em> of the <em>object</em></li>
+<li>A search is done to see if there is an appropriate <em>method</em> for that _class</li>
+<li>If there exists a <em>method</em> for that <em>class</em>, then that <em>method</em> is called on the <em>object</em> and we’re done</li>
+<li>If a <em>method</em> for that <em>class</em> doesn’t exist, a search is done to see if there is a default <em>method</em> for the <em>generic</em></li>
+<li>If a default exists, then the default <em>method</em> is called</li>
+<li>If a default method doesn’t exist, then an error is thrown</li>
+</ol>
+<hr />
+</div>
+<div id="examining-code-for-methods" class="section level2">
+<h2>Examining Code for Methods</h2>
+<ul>
+<li>You cannot just print the code for a <em>method</em> like other <em>functions</em> because the code for the <em>method</em> is usually hidden</li>
+<li>If you want to see the code for an <code>S3</code> <em>method</em>, you can use the <em>function</em> <code>getS3method()</code></li>
+<li>The call is <code>getS3method(&lt;generic&gt;, &lt;class&gt;)</code></li>
+<li>For <code>S4</code> <em>methods</em> you can use the <em>function</em> <code>getMethod()</code></li>
+<li>The call is <code>getMethod(&lt;generic&gt;, &lt;signature&gt;)</code> (more details later)</li>
+</ul>
+<hr />
+</div>
+<div id="s3-classmethod-example" class="section level2">
+<h2><code>S3</code> Class/Method: Example `</h2>
+<p>What’s happening here?</p>
+<pre class="r"><code>set.seed(2)
+x &lt;- rnorm(100)
+mean(x)</code></pre>
+<pre><code>[1] -0.03069816</code></pre>
+<ol style="list-style-type: decimal">
+<li>The <em>class</em> of <code>x</code> is <em>numeric</em></li>
+<li>But there is no <code>mean</code> method for numeric objects</li>
+<li>So we call the default function for <code>mean</code></li>
+</ol>
+<hr />
+</div>
+<div id="s3-classmethod-example-1" class="section level2">
+<h2>S3 Class/Method: Example 1</h2>
+<pre class="r"><code>head(getS3method(&quot;mean&quot;, &quot;default&quot;), 10)</code></pre>
+<pre><code>                                                                      
+1  function (x, trim = 0, na.rm = FALSE, ...)                         
+2  {                                                                  
+3      if (!is.numeric(x) &amp;&amp; !is.complex(x) &amp;&amp; !is.logical(x)) {      
+4          warning(&quot;argument is not numeric or logical: returning NA&quot;)
+5          return(NA_real_)                                           
+6      }                                                              
+7      if (na.rm)                                                     
+8          x &lt;- x[!is.na(x)]                                          
+9      if (!is.numeric(trim) || length(trim) != 1L)                   
+10         stop(&quot;'trim' must be numeric of length one&quot;)               </code></pre>
+<hr />
+</div>
+<div id="s3-classmethod-example-1-1" class="section level2">
+<h2>S3 Class/Method: Example 1</h2>
+<pre class="r"><code>tail(getS3method(&quot;mean&quot;, &quot;default&quot;), 10)</code></pre>
+<pre><code>                                                               
+15         if (anyNA(x))                                       
+16             return(NA_real_)                                
+17         if (trim &gt;= 0.5)                                    
+18             return(stats::median(x, na.rm = FALSE))         
+19         lo &lt;- floor(n * trim) + 1                           
+20         hi &lt;- n + 1 - lo                                    
+21         x &lt;- sort.int(x, partial = unique(c(lo, hi)))[lo:hi]
+22     }                                                       
+23     .Internal(mean(x))                                      
+24 }                                                           </code></pre>
+<hr />
+</div>
+<div id="s3-classmethod-example-2" class="section level2">
+<h2>S3 Class/Method: Example 2</h2>
+<p>What happens here?</p>
+<pre class="r"><code>set.seed(3)
+df &lt;- data.frame(x=rnorm(100), y=1:100)
+sapply(df, mean)</code></pre>
+<pre><code>          x           y 
+ 0.01103557 50.50000000 </code></pre>
+<ol style="list-style-type: decimal">
+<li>The class of <code>df</code> is “data.frame”; each column can be an object of a different class</li>
+<li>We <code>sapply</code> over the columns and call the <code>mean</code> function</li>
+<li>In each column, <code>mean</code> checks the class of the objects and dispatches the appropriate method</li>
+<li>We have a <code>numeric</code> column and an <code>integer</code> column; <code>mean</code> calls the default method for both</li>
+</ol>
+<hr />
+</div>
+<div id="calling-methods-directly" class="section level2">
+<h2>Calling Methods Directly</h2>
+<ul>
+<li>Some S3 methods are visible to the user (i.e. <code>mean.default</code>)</li>
+<li><strong>Never</strong> call methods directly</li>
+<li>Use the generic function and let the method be dispatched automatically</li>
+<li>With S4 methods you cannot call them directly at all</li>
+</ul>
+<hr />
+</div>
+<div id="s3-classmethod-example-3" class="section level2">
+<h2>S3 Class/Method: Example 3</h2>
+<p>The <code>plot</code> function is generic and its behavior depends on the object being plotted</p>
+<pre class="r"><code>set.seed(10)
+x &lt;- rnorm(100)
+plot(x)</code></pre>
+<div class="rimage center">
+<img src="data:image/png;base64,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" title alt class="plot" />
+</div>
+<hr />
+</div>
+<div id="s3-classmethod-example-3-1" class="section level2">
+<h2>S3 Class/Method: Example 3</h2>
+<p>For time series objects, <code>plot</code> connects the dots</p>
+<pre class="r"><code>set.seed(10)
+x &lt;- rnorm(100)
+x &lt;- as.ts(x)
+plot(x)</code></pre>
+<div class="rimage center">
+<img src="data:image/png;base64,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" title alt class="plot" />
+</div>
+<hr />
+</div>
+<div id="write-your-own-methods" class="section level2">
+<h2>Write Your Own Methods!</h2>
+<p>If you write new methods for new classes, you’ll probably end up writing methods for the following generics</p>
+<ul>
+<li><code>print</code>/<code>show</code></li>
+<li><code>summary</code></li>
+<li><code>plot</code></li>
+</ul>
+<p>There are two ways that you can extend the R system via classes/methods</p>
+<ul>
+<li>Write a method for a new class but for an existing generic function (i.e. like <code>print</code>)</li>
+<li>Write new generic functions and new methods for those generics</li>
+</ul>
+<hr />
+</div>
+<div id="s4-classes" class="section level2">
+<h2>S4 Classes</h2>
+<p>Why would you want to create a new class?</p>
+<ul>
+<li>To represent new types of data (e.g. gene expression, space-time, hierarchical, sparce matrices)</li>
+<li>New concepts/ideas that haven’t been thought of yet (.g. a fitted point process model, mixed-effects model, a sparse matrix)</li>
+<li>To abstract/hide implementation details from the user I say things are “new” meaning that R does not know about them (not that they are new to the statistical community)</li>
+</ul>
+<hr />
+</div>
+<div id="s4-classmethod-creating-a-new-class" class="section level2">
+<h2>S4 Class/Method: Creating a New Class</h2>
+<p>A new class can be defined using the <code>setClass()</code> function</p>
+<ul>
+<li>At a minimum you need to specify the name of the class</li>
+<li>You can also specify data elements that are called <em>slots</em></li>
+<li>You can then define methods for the class with the <code>setMethod()</code> function
+<ul>
+<li>Information about a class definition can be obtained with the <code>showClass()</code> function</li>
+</ul></li>
+</ul>
+<hr />
+</div>
+<div id="s4-classmethod-polygon-class" class="section level2">
+<h2>S4 Class/Method: Polygon Class</h2>
+<p>Creating new classes/methods is usually not something done at the console; you likely want to save the code in a separate file</p>
+<pre class="r"><code>library(methods)
+setClass(&quot;polygon&quot;,
+    representation(x=&quot;numeric&quot;,
+                   y=&quot;numeric&quot;))</code></pre>
+<ul>
+<li>The slots for this class are <code>x</code> and <code>y</code></li>
+<li>The slots for an S4 object can be accessed with the <code>@</code> operator</li>
+</ul>
+<hr />
+</div>
+<div id="s4-classmethod-polygon-class-1" class="section level2">
+<h2>S4 Class/Method: Polygon Class</h2>
+<p>A plot method can be created with the <code>setMethod</code> function</p>
+<ul>
+<li>For <code>setMethod</code> you need to specify a generic function (<code>plot</code>) and a <em>signature</em></li>
+<li>A signature is a character vector indicating the class of objects that are accepted by the method</li>
+<li>In this case, the <code>plot</code> method will take one type of object, a <code>polygon</code> object</li>
+</ul>
+<hr />
+</div>
+<div id="s4-classmethod-polygon-class-2" class="section level2">
+<h2>S4 Class/Method: Polygon Class</h2>
+<p>Creating a <code>plot</code> method with <code>setMethod</code></p>
+<pre class="r"><code>setMethod(&quot;plot&quot;, &quot;polygon&quot;,
+          function(x, y, ...) {
+              plot(x@x, x@y, type=&quot;n&quot;, ...)
+              xp &lt;- c(x@x, x@x[1])
+              yp &lt;- c(x@y, x@y[1])
+              lines(xp, yp)
+          })</code></pre>
+<pre><code>[1] &quot;plot&quot;</code></pre>
+<ul>
+<li>Notice that the slots of the polygon (the x- and y-coordinates) are accessed with the <code>@</code> operator</li>
+</ul>
+<hr />
+</div>
+<div id="s4-classmethod-polygon-class-3" class="section level2">
+<h2>S4 Class/Method: Polygon Class</h2>
+<p>After calling <code>setMethod</code> the new <code>plot</code> method will be added to the list of methods for <code>plot</code></p>
+<pre class="r"><code>library(methods)
+showMethods(&quot;plot&quot;)</code></pre>
+<pre><code>Function: plot (package graphics)
+x=&quot;ANY&quot;
+x=&quot;polygon&quot;</code></pre>
+<p>Notice that the signature for class <code>polygon</code> is listed. The method for <code>ANY</code> is the default method and it is what is called when no other signature matches</p>
+<hr />
+</div>
+<div id="s4-classmethod-polygon-class-4" class="section level2">
+<h2>S4 Class/Method: Polygon Class</h2>
+<pre class="r"><code>p &lt;- new(&quot;polygon&quot;, x=c(1, 2, 3, 4), y=c(1, 2, 3, 1))
+plot(p)</code></pre>
+<div class="rimage center">
+<img src="data:image/png;base64,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" title alt class="plot" />
+</div>
+<hr />
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<ul>
+<li>Developing classes and associated methods is a powerful way to extend the functionality of R</li>
+<li><strong>Classes</strong> define new data types</li>
+<li><strong>Methods</strong> extend <strong>generic functions</strong> to specify the behavior of generic functions on new classes</li>
+<li>As new data types and concepts are created, classes/methods provide a way for you to develop an intuitive interface to those data/concepts for users</li>
+</ul>
+<hr />
+</div>
+<div id="where-to-look-places-to-start" class="section level2">
+<h2>Where to Look, Places to Start</h2>
+<ul>
+<li>The best way to learn this stuff is to look at examples</li>
+<li>There are quite a few examples on CRAN which use S4 classes/methods. You can usually tell if they use S4 classes/methods if the <strong>methods</strong> package is listed in the <code>Depends:</code> field</li>
+<li>Bioconductor (<a href="http://www.bioconductor.org" class="uri">http://www.bioconductor.org</a>) – a rich resource, even if you know nothing about bioinformatics</li>
+<li>Some packages on CRAN (as far as I know) – SparseM, gpclib, flexmix, its, lme4, orientlib, filehash</li>
+<li>The stats4 package (comes with R) has a bunch of classes/methods for doing maximum likelihood analysis</li>
+</ul>
+</div>
 
 
 </div>
