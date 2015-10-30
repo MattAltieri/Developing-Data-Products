@@ -70,7 +70,279 @@ img {
 </div>
 
 
-
+<div id="what-is-an-r-package" class="section level2">
+<h2>What Is an <code>R</code> Package?</h2>
+<ul>
+<li>A mechanism for extending the basic functionality of <code>R</code></li>
+<li>A collection of <code>R</code> functions, or other (data) objects</li>
+<li>Organized in a systemic fashion to provide a minimal amount of consistency</li>
+<li>Written by users/developers everywhere</li>
+</ul>
+<hr />
+</div>
+<div id="where-are-these-r-packages" class="section level2">
+<h2>Where Are These <code>R</code> Packages?</h2>
+<ul>
+<li>Primarily availabile from CRAN and Bioconductor</li>
+<li>Also available from GitHub, Bitbucket, Gitorious, etc.</li>
+<li>Packages from CRAN/Bioconductor can be installed with <code>install.packages()</code></li>
+<li>Packages from GitHub can be installed using <code>install_github()</code> from the <code>devtools</code> package</li>
+</ul>
+<p>You do not have to put a package on a central repository, but doing so makes it easier for others to install your package</p>
+<hr />
+</div>
+<div id="whats-the-point" class="section level2">
+<h2>What’s the Point?</h2>
+<ul>
+<li>“Why not just make some code available?”</li>
+<li>Documentation / vignettes</li>
+<li>Centralized resources like CRAN</li>
+<li>Minimal standards for reliability and robustness</li>
+<li>Maintainability / extension</li>
+<li>Interface definition / clear API</li>
+<li>Users know that it will at least load properly</li>
+</ul>
+<hr />
+</div>
+<div id="package-development-process" class="section level2">
+<h2>Package Development Process</h2>
+<ul>
+<li>Write some code in an <code>R</code> script file (<code>.R</code>)</li>
+<li>Want to make code available to others</li>
+<li>Incorporate <code>R</code> script file into <code>R</code> package structure</li>
+<li>Write documentation for user functions</li>
+<li>Include some other material (examples, demos, datasets, tutorials)</li>
+<li>Package it up!</li>
+</ul>
+<hr />
+</div>
+<div id="package-development-process-1" class="section level2">
+<h2>Package Development Process</h2>
+<ul>
+<li>Submit package to CRAN or Bioconductor</li>
+<li>Push source code repository to GitHub or other source code sharing website</li>
+<li>People find all kinds of problems with your code
+<ul>
+<li>Scenario #1: They tell you about those problems and expect you to fix it</li>
+<li>Scenario #2: They fix the problem for you and show you the changes</li>
+</ul></li>
+<li>You incorporate the changes and release a new version</li>
+</ul>
+<hr />
+</div>
+<div id="r-package-essentials" class="section level2">
+<h2><code>R</code> Package Essentials</h2>
+<ul>
+<li>An <code>R</code> package is started by creating a directory with the name of the <code>R</code> package</li>
+<li>A <code>DESCRIPTION</code> file which has info about the package</li>
+<li><code>R</code> code! (in the <code>R/</code> subdirectory)</li>
+<li>Documentation (in the <code>man/</code> subdirectory)</li>
+<li><code>NAMESPACE</code> (optional, but do it)</li>
+<li>Full requirements in Writing <code>R</code> Extensions</li>
+</ul>
+<hr />
+</div>
+<div id="the-description-file" class="section level2">
+<h2>The <code>DESCRIPTION</code> File</h2>
+<ul>
+<li><strong>Package</strong>: Name of package (e.g. <code>library(name)</code>)</li>
+<li><strong>Title</strong>: Full name of package</li>
+<li><strong>Description</strong>: Longer description of package in one sentence (usually)</li>
+<li><strong>Version</strong>: Version number (usually in <em>M.m-p</em> format)</li>
+<li><strong>Author, Authors</strong>: Name of the original author(s)</li>
+<li><strong>Maintainer</strong>: Name + email of person who fixes problems</li>
+<li><strong>License</strong>: License for the source code</li>
+</ul>
+<hr />
+</div>
+<div id="the-description-file-1" class="section level2">
+<h2>The <code>DESCRIPTION</code> File</h2>
+<p>These fields are optional but commonly used</p>
+<ul>
+<li><strong>Depends</strong>: <code>R</code> packages that your package depends on</li>
+<li><strong>Suggests</strong>: Optional <code>R</code> packages that users may want to have installed</li>
+<li><strong>Date</strong>: Release date in <em>YYYY-MM-DD</em> format</li>
+<li><strong>URL</strong>: Package home page</li>
+<li><strong>Other</strong> fields can be added</li>
+</ul>
+<hr />
+</div>
+<div id="description-file-gpclib" class="section level2">
+<h2><code>DESCRIPTION</code> File: <code>gpclib</code></h2>
+<p><strong>Package</strong>: gpclib</p>
+<p><strong>Title</strong>: General Polygon Clipping Library for R</p>
+<p><strong>Description</strong>: General polygon clipping routines for R based on Alan Murta’s C library</p>
+<p><strong>Version</strong>: 1.5-5</p>
+<p><strong>Author</strong>: Roger D. Peng <a href="rpeng@jhsph.edu" class="uri">rpeng@jhsph.edu</a> with contributions from Duncan Murdoch and Barry Rowlingson; GPC library by Alan Murta</p>
+<p><strong>Maintainer</strong>: Roger D. Peng <a href="rpeng@jhsph.edu" class="uri">rpeng@jhsph.edu</a></p>
+<p><strong>License</strong>: file LICENSE</p>
+<p><strong>Depends</strong>: R (&lt;= 2.14.0), methods</p>
+<p><strong>Imports</strong>: graphics</p>
+<p><strong>Date</strong>: 2013-04-01</p>
+<p><strong>URL</strong>: <a href="http://www.cs.man.ac.uk/~toby/gpc/" class="uri">http://www.cs.man.ac.uk/~toby/gpc/</a>, <a href="http://github.com/rdpeng/gpclib" class="uri">http://github.com/rdpeng/gpclib</a></p>
+<hr />
+</div>
+<div id="r-code" class="section level2">
+<h2><code>R</code> code</h2>
+<ul>
+<li>Copy <code>R</code> code into the <code>R/</code> subdirectory</li>
+<li>There can be any number of files in this directory</li>
+<li>Usually separate out files into logical groups</li>
+<li>Code for all functions should be included here and not anywhere else in the package</li>
+</ul>
+<hr />
+</div>
+<div id="the-namespace-file" class="section level2">
+<h2>The <code>NAMESPACE</code> File</h2>
+<ul>
+<li>Used to indicate which functions are <strong>exported</strong></li>
+<li>Exported functions can be called by the user and are considered the public API</li>
+<li>Non-exported functions cannot be called directly by the user (but the code can be viewed)</li>
+<li>Hides implementation details from users and makes a cleaner package interface</li>
+</ul>
+<hr />
+</div>
+<div id="the-namespace-file-1" class="section level2">
+<h2>The <code>NAMESPACE</code> File</h2>
+<ul>
+<li>You can also indicate what functions you <strong>import</strong> from other packages</li>
+<li>This allows your package to use other packages without making other packages visible to the user</li>
+<li>Importing a function loads the package but does not attach it to the search list</li>
+</ul>
+<hr />
+</div>
+<div id="the-namespace-file-2" class="section level2">
+<h2>The <code>NAMESPACE</code> File</h2>
+<p>Key directives</p>
+<ul>
+<li><code>export(&quot;&lt;function&gt;&quot;)</code></li>
+<li><code>import(&quot;&lt;package&gt;&quot;)</code></li>
+<li><code>importFrom(&quot;&lt;package&gt;&quot;, &quot;&lt;function&gt;&quot;)</code></li>
+</ul>
+<p>Also important</p>
+<ul>
+<li><code>exportClasses(&quot;&lt;class&gt;&quot;)</code></li>
+<li><code>exportMethods(&quot;&lt;generic&gt;&quot;)</code></li>
+</ul>
+<hr />
+</div>
+<div id="namespace-file-mvtsplot-package" class="section level2">
+<h2><code>NAMESPACE</code> File: <code>mvtsplot</code> package</h2>
+<pre class="r"><code>export(&quot;mvtsplot&quot;)
+importFrom(graphics, &quot;Axis&quot;)
+import(splines)</code></pre>
+<hr />
+</div>
+<div id="namespace-file-gpclib-package" class="section level2">
+<h2><code>NAMESPACE</code> File: <code>gpclib</code> package</h2>
+<pre class="r"><code>export(&quot;read.polyfile&quot;, &quot;write.polyfile&quot;)
+importFrom(graphics, plot)
+exportClasses(&quot;gpc.poly&quot;, &quot;gpc.poly.nohole&quot;)
+exportMethods(&quot;show&quot;, &quot;get.bbox&quot;, &quot;plot&quot;, &quot;intersect&quot;, &quot;union&quot;, &quot;setdiff&quot;,
+              &quot;[&quot;, &quot;append.poly&quot;, &quot;scale.poly&quot;, &quot;area.poly&quot;, &quot;get.pts&quot;,
+              &quot;coerce&quot;, &quot;tristrip&quot;, &quot;trangulate&quot;)</code></pre>
+<hr />
+</div>
+<div id="documentation" class="section level2">
+<h2>Documentation</h2>
+<ul>
+<li>Documentation files (<code>.Rd</code>) placed in <code>man/</code> subdirectory</li>
+<li>Written in a specific markup language
+<ul>
+<li>Another reason to limit exported functions</li>
+</ul></li>
+<li>You can document other things like concepts, package overview</li>
+</ul>
+<hr />
+</div>
+<div id="help-file-example-line-function" class="section level2">
+<h2>Help File Example: <code>line</code> Function</h2>
+<pre><code>\name{line}
+\alias{line}
+\alias{residuals.tukeyline}
+\title{Robust Line Fitting}
+\description{
+    Fit a line robustly as recommended in \emph{Exploratory Data Analysis}.
+}
+\usage{
+line(x, y)
+}
+\arguments{
+    \item{x, y}{the arguments can be any way of specifying x-y pairs. See \code{\link{xy.coords}}.}
+}
+\details{
+    Cases with missing values are omitted.
+    
+    Long vectors are not supported.
+}
+\value{
+    An object of class \code{&quot;tukeyline&quot;}.
+    
+    Methods are available for the generic functions \code{coef},
+    \code{residuals}, \code{fitted}, and \code{print}.
+}
+\references{
+    Tukey, J. W. (1977).
+    \emph{Exploratory Data Analysis}
+    Reading Massachusetts: Addison-Wesley.
+}</code></pre>
+<hr />
+</div>
+<div id="building-and-checking" class="section level2">
+<h2>Building and Checking</h2>
+<ul>
+<li><code>R CMD build</code> is a command-line program that creates a package archive file (<code>.tar.gz</code>)</li>
+<li><code>R CMD check</code> runs a battery of tests on the package</li>
+<li>You can run <code>R CMD build</code> or <code>R CMD check</code> from the command-line using a terminal or command-shell application</li>
+<li>You can also run them from <code>R</code> using the <code>system()</code> function</li>
+</ul>
+<pre class="r"><code>system(&quot;R CMD build newpackage&quot;)
+system(&quot;R CMD check newpackage&quot;)</code></pre>
+<hr />
+</div>
+<div id="checking" class="section level2">
+<h2>Checking</h2>
+<ul>
+<li><code>R CMD check</code> runs a battery of tests</li>
+<li>Documentation exists</li>
+<li>Code can be loaded, no major coding problems or errors</li>
+<li>Run examples in documentation</li>
+<li>Check docs match code</li>
+<li>All tests must pass to put package on CRAN</li>
+</ul>
+<hr />
+</div>
+<div id="getting-started" class="section level2">
+<h2>Getting Started</h2>
+<ul>
+<li>The <code>package.skeleton()</code> function in the <code>utils</code> package creates a “skeleton” <code>R</code> package</li>
+<li>Directory structure (<code>R/</code>, <code>man/</code>), <code>DESCRIPTION</code> file, <code>NAMESPACE</code> file, documentation files</li>
+<li>If there are functions visible in your workspace, it writes <code>R</code> code files to the <code>R\</code> directory</li>
+<li>Documentation stubs are created in <code>man\</code></li>
+<li>You need to fill in the rest!</li>
+</ul>
+<hr />
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<ul>
+<li><code>R</code> packages provide a systematic way to make <code>R</code> code available to others</li>
+<li>Standards ensure that packages have a minimal amount of documentation and robustness</li>
+<li>Obtained from CRAN, Bioconductor, Github, etc.</li>
+</ul>
+<hr />
+</div>
+<div id="summary-1" class="section level2">
+<h2>Summary</h2>
+<ul>
+<li>Create a new directory with <code>R\</code> and <code>man\</code> subdirectories (or just use <code>package.skeleton()</code>)</li>
+<li>Write a <code>DESCRIPTION</code> file</li>
+<li>Copy <code>R</code> code into the <code>R\</code> subdirectory</li>
+<li>Write documentation files in <code>man\</code> subdirectory</li>
+<li>Write a <code>NAMESPACE</code> file with exports/imports</li>
+<li>Build and check</li>
+</ul>
+</div>
 
 
 </div>
